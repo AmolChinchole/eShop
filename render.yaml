@@ -21,8 +21,9 @@ services:
     autoDeploy: true
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: cherish-frontend
+    env: static
     region: oregon
     plan: free
     buildCommand: npm install && npm run build
@@ -32,10 +33,3 @@ services:
         value: https://cherish-backend.onrender.com/api
     rootDir: my-app
     autoDeploy: true
-    headers:
-      - path: /*
-        name: Cache-Control
-        value: public, max-age=31536000, immutable
-      - path: /index.html
-        name: Cache-Control
-        value: no-cache
