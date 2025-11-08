@@ -1,12 +1,13 @@
 services:
+  # Backend API Service
   - type: web
     name: cherish-backend
     env: node
-    rootDir: backend
+    region: oregon
+    plan: free
     buildCommand: npm install
     startCommand: node server.js
-    plan: free
-    autoDeploy: true
+    healthCheckPath: /health
     envVars:
       - key: MONGO_URI
         sync: false
@@ -14,14 +15,27 @@ services:
         sync: false
       - key: STRIPE_SECRET_KEY
         sync: false
-  - type: web
-    name: cherish-frontend
-    env: static
-    rootDir: my-app
-    buildCommand: npm install && npm run build
-    outputDir: dist
-    plan: free
+      - key: NODE_ENV
+        value: production
+    rootDir: backend
     autoDeploy: true
+
+  # Frontend Static Site
+  - type: static
+    name: cherish-frontend
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         value: https://cherish-backend.onrender.com/api
+    rootDir: my-app
+    autoDeploy: true
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
