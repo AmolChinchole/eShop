@@ -63,8 +63,29 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const clearCart = () => {
+    setCartItems([]);
+    try {
+      toast.info('Cart has been cleared');
+    } catch (e) {
+      console.log('Cart has been cleared');
+    }
+  };
+
+  // Calculate cart total
+  const cartTotal = cartItems.reduce(
+    (total, item) => total + (item.price * (item.qty || 1)),
+    0
+  );
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ 
+      cartItems, 
+      addToCart, 
+      removeFromCart, 
+      clearCart,
+      cartTotal
+    }}>
       {children}
     </CartContext.Provider>
   );

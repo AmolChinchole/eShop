@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     default: []
   },
   isAdmin: { type: Boolean, default: false }
+  ,
+  // Fields for email OTP login
+  otp: { type: String },
+  otpExpires: { type: Date }
 }, { timestamps: true });
 
 // Password hash before save

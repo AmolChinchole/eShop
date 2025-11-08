@@ -2,6 +2,7 @@ import express from "express";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
 
@@ -49,6 +50,90 @@ router.post(
       res.status(401);
       throw new Error("Invalid credentials");
     }
+  })
+);
+
+// Send OTP to email for login
+router.post(
+  "/send-otp",
+  asyncHandler(async (req, res) => {
+    console.log("📧 Received OTP request for email:", req.body?.email);
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found. Please register first." });
+    }
+
+    // Generate 6-digit OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const expires = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
+
+    user.otp = otp;
+    user.otpExpires = expires;
+    await user.save();
+
+    // Send email using nodemailer
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: process.env.SMTP_SECURE === "true",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const from = process.env.FROM_EMAIL || process.env.SMTP_USER;
+      const mail = {
+        from,
+        to: user.email,
+        subject: "Your OTP for eShop",
+        text: `Your verification code is ${otp}. It expires in 10 minutes.`,
+      };
+
+      await transporter.sendMail(mail);
+      res.json({ success: true, message: "OTP sent to email" });
+    } catch (err) {
+      // If email sending fails, still return success but log the OTP to server logs for testing
+      console.error("Failed to send OTP email, OTP:", otp, err);
+      res.json({ success: true, message: "OTP generated (email sending failed in server). Check server logs for OTP in development." });
+    }
+  })
+);
+
+// Verify OTP and issue JWT
+router.post(
+  "/verify-otp",
+  asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.otp || !user.otpExpires || new Date() > user.otpExpires) {
+      return res.status(400).json({ message: "OTP expired or not generated" });
+    }
+
+    if (String(user.otp) !== String(otp)) {
+      return res.status(401).json({ message: "Invalid OTP" });
+    }
+
+    // Clear OTP fields
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    // Issue token
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
+    });
   })
 );
 

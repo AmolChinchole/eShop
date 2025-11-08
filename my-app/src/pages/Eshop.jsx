@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import WishlistButton from "../components/WishlistButton";
 import { fetchProductsWithParams } from "../api/api";
+import { resolveImageUrl } from "../utils/image";
 
 export default function Eshop() {
   const [productsData, setProductsData] = useState({ products: [], page: 1, pages: 1 });
@@ -71,18 +73,29 @@ export default function Eshop() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {productsData.products.map((p) => (
-              <div key={p._id || p.id} className="border rounded p-3 hover:shadow-lg transition">
-                <Link to={`/product/${p._id || p.id}`}>
-                  <img src={p.image || p.images?.[0] || "/placeholder.png"} alt={p.name} className="h-40 w-full object-cover mb-2 rounded" />
-                  <h3 className="font-semibold text-sm">{p.name}</h3>
-                </Link>
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="text-lg font-bold">₹{p.price}</div>
-                  <Link to={`/product/${p._id || p.id}`} className="text-sm text-blue-600">View</Link>
+            {productsData.products.map((p) => {
+              const img = p.image || p.images?.[0] || null;
+              const src = resolveImageUrl(img, { w: 600, h: 400 });
+
+              return (
+                <div key={p._id || p.id} className="border rounded p-3 hover:shadow-lg transition relative">
+                  <Link to={`/product/${p._id || p.id}`} className="block">
+                    <img src={src} alt={p.name} className="h-40 w-full object-cover mb-2 rounded" onError={(e) => { e.currentTarget.src = resolveImageUrl(null, { w: 600, h: 400 }); }} />
+                    <h3 className="font-semibold text-sm">{p.name}</h3>
+                  </Link>
+
+                  {/* Wishlist heart - top right of card */}
+                  <div className="absolute top-3 right-3">
+                    <WishlistButton productId={p._id || p.id} />
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="text-lg font-bold">₹{p.price}</div>
+                    <Link to={`/product/${p._id || p.id}`} className="text-sm text-blue-600">View</Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-6 flex items-center justify-center space-x-2">

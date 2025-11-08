@@ -8,6 +8,8 @@ import dotenv from "dotenv";
 import productRoutes from "./routes/productRoute.js";
 import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import wishlistRoutes from "./routes/wishlistRoutes.js";
 
 dotenv.config();
 
@@ -17,11 +19,20 @@ const app = express();
 app.use(cors());            // Enable Cross-Origin requests
 app.use(express.json());    // Parse JSON bodies
 
+// ✅ Serve uploaded images
+app.use("/uploads", express.static("uploads"));
+
 // Routes
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
-// payments route removed per user request (no external payment integration)
+app.use("/api/payment", paymentRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+
+// Simple health check (useful for Render)
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
 
 // Handle undefined routes
 app.use((req, res) => {

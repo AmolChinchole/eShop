@@ -18,15 +18,15 @@ const orderSchema = new mongoose.Schema({
     country: String,
   },
   paymentMethod: { type: String },
-  paymentResult: { type: Object },
+  paymentId: { type: String },
   itemsPrice: { type: Number, required: true, default: 0.0 },
   taxPrice: { type: Number, required: true, default: 0.0 },
   shippingPrice: { type: Number, required: true, default: 0.0 },
   totalPrice: { type: Number, required: true, default: 0.0 },
-  stripeSessionId: { type: String },
-  isPaid: { type: Boolean, default: false },
-  paidAt: { type: Date },
-  status: { type: String, default: "Pending" }
+  paymentStatus: { type: String, default: "Success" },
+  isPaid: { type: Boolean, default: true },
+  paidAt: { type: Date, default: Date.now },
+  status: { type: String, default: "Confirmed" }
 }, { timestamps: true });
 
 export default mongoose.model("Order", orderSchema);

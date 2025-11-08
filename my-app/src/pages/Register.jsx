@@ -28,9 +28,33 @@ export default function Register() {
   return (
     <form onSubmit={handleSubmit} className="p-8 max-w-md mx-auto">
       <h1 className="text-2xl mb-4">Register</h1>
-      <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 mb-2 border rounded" required />
-      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-2 mb-2 border rounded" required />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-2 mb-2 border rounded" required />
+      <input 
+        type="text" 
+        placeholder="Name" 
+        value={name} 
+        onChange={e => setName(e.target.value)} 
+        className="w-full p-2 mb-2 border rounded" 
+        autoComplete="name"
+        required 
+      />
+      <input 
+        type="email" 
+        placeholder="Email" 
+        value={email} 
+        onChange={e => setEmail(e.target.value)} 
+        className="w-full p-2 mb-2 border rounded" 
+        autoComplete="username"
+        required 
+      />
+      <input 
+        type="password" 
+        placeholder="Password" 
+        value={password} 
+        onChange={e => setPassword(e.target.value)} 
+        className="w-full p-2 mb-2 border rounded" 
+        autoComplete="new-password"
+        required 
+      />
       {error && <p className="text-red-600 mb-2">{error}</p>}
       <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Register</button>
     </form>

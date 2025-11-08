@@ -3,9 +3,12 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home.jsx";
+import Wishlist from "./pages/Wishlist.jsx";
+import { WishlistProvider } from "./context/WishlistContext";
 import Eshop from "./pages/Eshop.jsx";
 import ProductScreen from "./pages/ProductScreen.jsx"; // points to pages only
 import Login from "./pages/Login.jsx";
+import OTPLogin from "./pages/OTPLogin.jsx";
 import Register from "./pages/Register.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
@@ -20,35 +23,46 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 export default function App() {
   return (
     <Router>
-      <Header />
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Eshop />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/product/:id" element={<ProductScreen />} /> {/* Dynamic product route */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
-        />
-    <Route path="/checkout/success" element={<CheckoutSuccess />} />
-    <Route path="/eshop" element={<Eshop />} />
-    <Route path="/contact" element={<Contact />} />
-    <Route path="/about" element={<About />} />
-      </Routes>
+      <WishlistProvider>
+        <Header />
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Eshop />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/product/:id" element={<ProductScreen />} /> {/* Dynamic product route */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/otp-login" element={<OTPLogin />} />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/checkout/success" element={<CheckoutSuccess />} />
+          <Route path="/eshop" element={<Eshop />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <Wishlist />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </WishlistProvider>
     </Router>
   );
 }
